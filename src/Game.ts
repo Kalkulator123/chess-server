@@ -8,7 +8,6 @@ export enum GameType {
 export class Game {
     private readonly _id: number;
     private type: GameType;
-    private board: any;
 
     constructor(id = 0, gameType = GameType.Stockfish) {
         this._id = id;

@@ -2,7 +2,7 @@ import { Unit, UnitType, UnitTeam } from "./Unit";
 
 export class BetterFen {
     private _value: Unit[][];
-    private readonly regexPattern: RegExp = /^[PBNRQKpbnrqk\/1-9]+$/;
+    private readonly regexPattern: RegExp = /^[PBNRQKpbnrqk\/1-8]+$/;
 
     constructor(fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR") {
         if (this.regexPattern.test(fen)) {

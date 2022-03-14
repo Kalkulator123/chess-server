@@ -31,9 +31,16 @@
 //     });
 // })
 
-import { Game, GameType } from './Game';
-import { BetterFen } from './BetterFen';
-import { Unit, UnitType } from "./Unit";
+// import { Game, GameType } from './Game';
+// import { BetterFen } from './BetterFen';
+// import { Unit, UnitType } from "./Unit";
 
-const myFen = new BetterFen("rnbqkbnr/p3pppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
-console.log(myFen.stringValue);
+// const myFen = new BetterFen("rnbqkbnr/p3pppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+// console.log(myFen.stringValue);
+
+import { Stockfish } from "./Stockfish";
+
+let stockfish = new Stockfish();
+
+let str = stockfish.promise;
+str.then(res => console.log(res.stdout));

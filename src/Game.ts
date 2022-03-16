@@ -1,28 +1,22 @@
-export enum GameType {
-    Stockfish,
-    Versus,
-    Sandbox
-}
+import { BetterFen } from "./BetterFen";
+import { Stockfish } from "./Stockfish";
 
-// Base game class
 export class Game {
     private readonly _id: number;
-    private type: GameType;
+    private readonly fen: BetterFen = new BetterFen();
+    private readonly stockfish: Stockfish = new Stockfish();
 
-    constructor(id = 0, gameType = GameType.Stockfish) {
+    constructor(id = 0) {
         this._id = id;
-        this.type = gameType;
+    }
+
+    private updateFen() {
+        this.stockfish.response("d").then(res => {
+            //const output = res.split("\n");
+        });
     }
 
     get id(): number {
         return this._id;
-    }
-
-    get gameType(): GameType {
-        return this.type;
-    }
-
-    set gameType(gameType: GameType) {
-        this.type = gameType;
     }
 }

@@ -1,35 +1,36 @@
-// const express = require('express');
-// const server = express();
-// const PORT = 8080;
+import config from "./config.json";
 
-// server.use(express.json());
+const express = require('express');
+const server = express();
+const PORT = config.port;
 
-// server.listen(PORT, () => {
-//         console.log(`\nHi, im alive now... \nhttp://localhost:${PORT}/\n`);
-//     }
-// );
+server.use(express.json());
 
-// server.get('/me', (req: any, res: any) => {
-//     res.status(200).send({
-//         name: 'server-chess',
-//         version: '1.0.0'
-//     })
-// });
+server.listen(PORT, () => {
+        console.log(`\nhttp://localhost:${PORT}/\n`);
+    }
+);
 
-// server.post('me/:id', (req: any, res: any) => {
-//     const { id } = req.params;
-//     const { logo } = req.body;
+server.get('/me', (req: any, res: any) => {
+    res.status(200).send({
+        name: 'server-chess',
+        version: '1.0.0'
+    })
+});
 
-//     if(!logo) {
-//         res.status(418).send({
-//             message: 'err: need logo'
-//         });
-//     }
+server.get('/game/fen', (req: any, res: any) => {
+    const { id } = req.params;
 
-//     res.send({
-//         tshirt: 'yay!'
-//     });
-// })
+    if(false) {
+        res.status(418).send({
+            message: 'err: need logo'
+        });
+    }
+
+    res.send({
+        tshirt: 'yay!'
+    });
+})
 
 // import { Game, GameType } from './Game';
 // import { BetterFen } from './BetterFen';
@@ -38,8 +39,7 @@
 // const myFen = new BetterFen("rnbqkbnr/p3pppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
 // console.log(myFen.stringValue);
 
-import { Stockfish } from "./Stockfish";
+// import { Stockfish } from "./Stockfish";
 
-let stockfish = new Stockfish();
-
-stockfish.response();
+// let stockfish = new Stockfish();
+// stockfish.response("d");

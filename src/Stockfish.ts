@@ -1,13 +1,10 @@
 import { exec } from "child_process";
 import util from "util";
 
+import config from "./config.json";
+
 export class Stockfish {
-    private _promise: Promise<any>;
     private execProm = util.promisify(exec);
-    
-    constructor() {
-        this._promise = this.askStockfish(".\\stockfish\\stockfish.exe d");
-    }
 
     private async askStockfish(command: string): Promise<any> {
         let result;
@@ -23,14 +20,11 @@ export class Stockfish {
         return result;
     }
 
-    public async response() {
-        const bar = await this.askStockfish(".\\stockfish\\stockfish.exe d");
+    public async response(command: string) {
+        const bar = await this.askStockfish(config.stockfish_path + " " + command);
         let output = bar.stdout.split("\n");
-        let fen = output[output.length - 4].split(" ");
-        console.log(fen[1]);
+        console.log(output[output.length - 4].split(" ")[1]);
     };
 
-    get promise(): Promise<any> {
-        return this._promise;
-    }
+    
 }

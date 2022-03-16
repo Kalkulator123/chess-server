@@ -42,5 +42,4 @@ import { Stockfish } from "./Stockfish";
 
 let stockfish = new Stockfish();
 
-let str = stockfish.promise;
-str.then(res => console.log(res.stdout));
+stockfish.response();

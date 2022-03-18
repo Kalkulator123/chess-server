@@ -1,4 +1,4 @@
 {
-    "stockfish_path": ".\\stockfish\\stockfish.exe",
+    "stockfish_path": "stockfish/stockfish",
     "port": "8080"
 }

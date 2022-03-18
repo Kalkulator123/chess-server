@@ -10,11 +10,11 @@ export class Game {
         this._id = id;
     }
 
-    private updateFen() {
-        this.stockfish.response("d").then(res => {
-            //const output = res.split("\n");
-        });
-    }
+    // private updateFen() {
+    //     this.stockfish.response("d").then(res => {
+    //         //const output = res.split("\n");
+    //     });
+    // }
 
     get id(): number {
         return this._id;

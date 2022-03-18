@@ -20,11 +20,11 @@ export class Stockfish {
         return result;
     }
 
-    public async response(command: string) {
-        const bar = await this.askStockfish(config.stockfish_path + " " + command);
-        let output = bar.stdout.split("\n");
-        console.log(output[output.length - 4].split(" ")[1]);
-    };
-
-    
+    public async getFen(): Promise<any> {
+        const response = await this.askStockfish(config.stockfish_path + " d");
+        let output = response.stdout.split('\n');
+        output = output[output.length - 4].split(' ');
+        output.shift();
+        return output;
+    }
 }

@@ -1,5 +1,7 @@
 import config from "./config.json";
 
+import { Stockfish } from "./Stockfish";
+
 const express = require('express');
 const server = express();
 const PORT = config.port;
@@ -18,14 +20,21 @@ server.get('/me', (req: any, res: any) => {
     })
 });
 
-server.get('/game/fen', (req: any, res: any) => {
+server.get('/game/:id', (req: any, res: any) => {
     const { id } = req.params;
 
-    if(false) {
+    if(isNaN(parseInt(id))) {
         res.status(418).send({
-            message: 'err: need logo'
+            message: 'err: no id'
         });
+
+        return;
     }
+
+    const stockfish = new Stockfish();
+    stockfish.getFen().then(stockfishResponse => {
+        console.log(stockfishResponse);
+    });
 
     res.send({
         tshirt: 'yay!'

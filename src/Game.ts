@@ -1,5 +1,6 @@
 import { BetterFen } from "./BetterFen";
 import { Stockfish } from "./Stockfish";
+import { Unit } from "./Unit";
 
 export class Game {
     private readonly _id: number;
@@ -11,8 +12,20 @@ export class Game {
     }
 
     // private updateFen() {
-    //     this.stockfish.response("d").then(res => {
-    //         //const output = res.split("\n");
+    //     this.stockfish.getFen().then(stockfishResponse => {
+    //         this.fen.setFenByString(stockfishResponse[0]);
+    //     });
+    // }
+
+    // public getFen(): Unit[][] {
+    //     this.updateFen();
+    //     return this.fen.value;
+    // }
+
+    // public makeMove(move: string) {
+    //     this.updateFen();
+    //     this.stockfish.makeMove(move, this.fen.stringValue).then(res => {
+
     //     });
     // }
 

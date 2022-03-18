@@ -1,5 +1,6 @@
 import config from "./config.json";
 
+import { Game } from "./Game";
 import { Stockfish } from "./Stockfish";
 
 const express = require('express');
@@ -31,15 +32,33 @@ server.get('/game/:id', (req: any, res: any) => {
         return;
     }
 
-    const stockfish = new Stockfish();
-    stockfish.getFen().then(stockfishResponse => {
-        console.log(stockfishResponse);
-    });
+    const game = new Game(id);
+    // res.send(game.getFen());
+});
 
-    res.send({
-        tshirt: 'yay!'
-    });
-})
+server.post('/game/:id', (req: any, res: any) => {
+    const { id } = req.params;
+    const { move } = req.body.move;
+
+    if(isNaN(parseInt(id))) {
+        res.status(418).send({
+            message: 'err: no id'
+        });
+
+        return;
+    }
+
+    if(move === "") {
+        res.status(418).send({
+            message: 'err: no move'
+        });
+
+        return;
+    }
+});
+
+let stockfish = new Stockfish();
+stockfish.run();
 
 // import { Game, GameType } from './Game';
 // import { BetterFen } from './BetterFen';

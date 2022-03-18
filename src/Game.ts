@@ -1,33 +1,46 @@
-import { BetterFen } from "./BetterFen";
 import { Stockfish } from "./Stockfish";
-import { Unit } from "./Unit";
+
+const fs = require('fs');
 
 export class Game {
     private readonly _id: number;
-    private readonly fen: BetterFen = new BetterFen();
     private readonly stockfish: Stockfish = new Stockfish();
 
     constructor(id = 0) {
         this._id = id;
+
+        // this.stockfish.sendCommand('position startpos moves e2e4');
+
+        // this.stockfish.sendCommand('position startpos moves e2e4 g8f6');
+
+        this.stockfish.sendCommand('d');
+
+        this.stockfish.endSession();
     }
 
-    // private updateFen() {
-    //     this.stockfish.getFen().then(stockfishResponse => {
-    //         this.fen.setFenByString(stockfishResponse[0]);
-    //     });
-    // }
+    public listen() {
+        return this.stockfish;
+    }
 
-    // public getFen(): Unit[][] {
-    //     this.updateFen();
-    //     return this.fen.value;
-    // }
+    public makeMove(move: string) {
+        this.stockfish.sendCommand('')
+    }
 
-    // public makeMove(move: string) {
-    //     this.updateFen();
-    //     this.stockfish.makeMove(move, this.fen.stringValue).then(res => {
+    public saveToFile(fen: string[]) {
+        let file = fs.createWriteStream("games/" + this.id.toString() + ".txt");
+        let json = JSON.stringify(fen);
+        file.write(json);
+        file.end();
+    }
 
-    //     });
-    // }
+    public loadFromFile() {
+        fs.readFile("games/" + this.id.toString() + ".txt", (err: any, data: any) => {
+            if(err) {
+                throw err;
+            }
+            console.log(data);
+        });
+    }
 
     get id(): number {
         return this._id;

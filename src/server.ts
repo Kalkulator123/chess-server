@@ -1,3 +1,10 @@
+//todo:
+//add create game
+//add make move
+//add getfen from file if game exists
+
+
+
 import config from "./config.json";
 
 import { Game } from "./Game";
@@ -33,7 +40,14 @@ server.get('/game/:id', (req: any, res: any) => {
     }
 
     const game = new Game(id);
-    // res.send(game.getFen());
+    game.listen().getData().stdout.on('data', (data: any) => {
+        let output = data.toString().split("\n");
+        if(output.length > 2) {
+            output = (output[output.length - 4].split(' '));
+            game.saveToFile(output);
+            res.send(output.slice(1));
+        }
+    });
 });
 
 server.post('/game/:id', (req: any, res: any) => {
@@ -55,19 +69,8 @@ server.post('/game/:id', (req: any, res: any) => {
 
         return;
     }
+
+    const game = new Game(id);
 });
 
-let stockfish = new Stockfish();
-stockfish.run();
-
-// import { Game, GameType } from './Game';
-// import { BetterFen } from './BetterFen';
-// import { Unit, UnitType } from "./Unit";
-
-// const myFen = new BetterFen("rnbqkbnr/p3pppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
-// console.log(myFen.stringValue);
-
-// import { Stockfish } from "./Stockfish";
-
-// let stockfish = new Stockfish();
-// stockfish.response("d");
+let game = new Game();

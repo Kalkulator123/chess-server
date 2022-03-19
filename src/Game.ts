@@ -13,9 +13,7 @@ export class Game {
 
         // this.stockfish.sendCommand('position startpos moves e2e4 g8f6');
 
-        this.stockfish.sendCommand('d');
-
-        this.stockfish.endSession();
+        //this.stockfish.sendCommand('d');
     }
 
     public listen() {
@@ -23,7 +21,7 @@ export class Game {
     }
 
     public makeMove(move: string) {
-        this.stockfish.sendCommand('')
+        this.stockfish.sendCommand(move);
     }
 
     public saveToFile(fen: string[]) {

@@ -1,16 +1,13 @@
 //todo:
-//add create game
-//add make move
-//add getfen from file if game exists
-
-
+//add bot make move
 
 import config from "./config.json";
+import express from 'express';
+import fs from 'fs';
 
 import { Game } from "./Game";
 import { Stockfish } from "./Stockfish";
 
-const express = require('express');
 const server = express();
 const PORT = config.port;
 
@@ -21,6 +18,7 @@ server.listen(PORT, () => {
     }
 );
 
+//server info
 server.get('/me', (req: any, res: any) => {
     res.status(200).send({
         name: 'server-chess',
@@ -28,6 +26,37 @@ server.get('/me', (req: any, res: any) => {
     })
 });
 
+let gameId = 0;
+server.post('/game/create', (req: any, res: any) => {
+    for(;;) {
+        if(!fs.existsSync('games/' + gameId + '.txt')) {
+            break;
+        }
+    }
+
+    const game = new Game(gameId);
+    game.makeMove('d');
+    game.listen().getData().stdout.on('data', (data: any) => {
+        let output = data.toString().split("\n");
+        if(output.length > 2) {
+            output = (output[output.length - 4].split(' '));
+            game.saveToFile(output);
+            setTimeout(() => {
+                if(fs.existsSync('games/' + gameId + '.txt')) {
+                    fs.readFile('games/' + gameId++ + '.txt', (err, data) => {
+                        let out = data.toString();
+                        out = out.substring(1, out.length - 1).split('"').join("");
+                        let result = out.split(",");
+                        res.send(result);
+                    });
+                    return;
+                }
+            }, 500);
+        }
+    });
+});
+
+//get fen
 server.get('/game/:id', (req: any, res: any) => {
     const { id } = req.params;
 
@@ -39,20 +68,21 @@ server.get('/game/:id', (req: any, res: any) => {
         return;
     }
 
-    const game = new Game(id);
-    game.listen().getData().stdout.on('data', (data: any) => {
-        let output = data.toString().split("\n");
-        if(output.length > 2) {
-            output = (output[output.length - 4].split(' '));
-            game.saveToFile(output);
-            res.send(output.slice(1));
+        if(fs.existsSync('games/' + id + '.txt')) {
+            fs.readFile('games/' + id + '.txt', (err, data) => {
+                let out = data.toString();
+                out = out.substring(1, out.length - 1).split('"').join("");
+                let result = out.split(",");
+                res.send(result);
+            });
+            return;
         }
-    });
 });
 
-server.post('/game/:id', (req: any, res: any) => {
-    const { id } = req.params;
-    const { move } = req.body.move;
+
+//make move
+server.post('/game/:id/:move', (req: any, res: any) => {
+    const { id, move } = req.params;
 
     if(isNaN(parseInt(id))) {
         res.status(418).send({
@@ -70,7 +100,62 @@ server.post('/game/:id', (req: any, res: any) => {
         return;
     }
 
-    const game = new Game(id);
-});
+    if(fs.existsSync('games/' + id + '.txt')) {
+        fs.readFile('games/' + id + '.txt', (err, data) => {
+            let game = new Game(id);
+            let out = data.toString();
+            out = out.substring(1, out.length - 1).split('"').join("");
+            let result = out.split(",");
 
-let game = new Game();
+            game.makeMove('position fen ' + result[1] + " " + result[2] + " " + result[3] + " " + result[4] + " " + result[5] + " " + result[6] + " moves " + move);
+
+            setTimeout(() => {
+                game.makeMove('d');
+                game.listen().getData().stdout.on('data', (data: any) => {
+                    let output = data.toString().split("\n");
+                    if(output.length > 2) {
+                        output = (output[output.length - 4].split(' '));
+                        game.saveToFile(output);
+                    }
+                });
+            }, 1000);
+        });
+
+        // fs.readFile('games/' + id + '.txt', (err, data) => {
+        //     let game = new Game(id);
+        //     let out = data.toString();
+        //     out = out.substring(1, out.length - 1).split('"').join("");
+        //     let result = out.split(",");
+
+        //     game.makeMove("go movetime 1000");
+        //     let response: string[] = [];
+        //     setTimeout(() => {
+        //         game.listen().getData().stdout.on('data', (data: any) => {
+        //             let output = data.toString().split("\n");
+        //             if(output.length > 2) {
+        //                 let botMove = data.toString().split("\n");
+        //                 botMove = botMove[1].split(" ");
+        //                 if(botMove[0] == "bestmove") {
+        //                     game.makeMove('position fen ' + result[1] + " " + result[2] + " " + result[3] + " " + result[4] + " " + result[5] + " " + result[6] + " moves " + botMove[3]);
+        //                 }
+        //                 game.makeMove('d');
+        //                 let output = data.toString().split("\n");
+
+        //                 setTimeout(() => {
+        //                     if(output[0] === "") {
+        //                         response = output[output.length - 4].split(" ");
+        //                         console.log(response);
+        //                     }
+        //                 }, 1000);
+        //                 // res.send(output.slice(1));
+        //             }
+        //         });
+        //     }, 1000);
+
+        //     setTimeout(() => {
+        //         game.saveToFile(response);
+        //         res.send(response);
+        //     }, 4000);
+        // });
+    }
+});

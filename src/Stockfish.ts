@@ -1,30 +1,39 @@
-import { exec } from "child_process";
-import util from "util";
+//TODO:
+// - make move
+// - get bot best move
 
 import config from "./config.json";
 
 export class Stockfish {
     private readonly session = require('child_process').spawn(config.stockfish_path);
 
-    constructor() {       
-        this.session.on('exit', (code: any) => {
-            console.log('child process exited with code ' + code);
+    constructor() {
+        this.getFen().then((data: any) => {
+            console.log(data);
         });
     }
 
-    public getData(): any {
-        return this.session;
-    }
+    public async getFen(): Promise<string[]> {
+        this.session.stdin.write("d\n");
 
-    public sendCommand(command: string) {
-        setTimeout(() => {
-            this.session.stdin.write(command + '\n');
-        }, 1000);
+        const output = new Promise<string>((resolve) => {
+            this.session.stdout.on('data', (data: any) => {
+                const board = data.toString().split('\n');
+
+                if(board[0] === '\r') {
+                    resolve(board);
+                }
+            });
+        }).then(result => {
+            const fen = result[result.length - 4].split(' ').reverse();
+            fen.pop();
+            return fen.reverse();
+        });
+
+        return output; 
     }
 
     public endSession() {
-        setTimeout(() => {
-            this.session.stdin.end();
-        }, 1000);
+        this.session.stdin.end();
     }
 }

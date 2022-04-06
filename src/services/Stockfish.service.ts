@@ -58,14 +58,11 @@ export class Stockfish {
     }
 
     private separateBestmove(bestmoveStringArr: string[]): string {
-        let bestmove = "";
-        for(let i = 0; i < bestmoveStringArr.length; i++) {
-            if (bestmoveStringArr[i].includes("bestmove")) {
-                bestmove = bestmoveStringArr[i];
-            }
+        if(this.find(bestmoveStringArr, "bestmove")) {
+            return this.find(bestmoveStringArr, "bestmove").split(' ')[1];
         }
 
-        return bestmove.split(' ')[1];
+        return "";
     }
 
     private clearFen(fen: string): string[] {
@@ -76,11 +73,19 @@ export class Stockfish {
         return fenArr.reverse();
     }
 
-    private separateFen(array: string[]): string {
+    private find(array: string[], str: string): string {
         for(let i = 0; i < array.length; i++) {
-            if (array[i].includes("Fen")) {
+            if (array[i].includes(str)) {
                 return array[i];
             }
+        }
+
+        return "";
+    }
+
+    private separateFen(array: string[]): string {
+        if(this.find(array, "Fen")) {
+            return this.find(array, "Fen");
         }
 
         return "";

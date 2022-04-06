@@ -15,9 +15,9 @@ export class Stockfish {
         return this.getFen(); 
     }
 
-    public async makeBestMove(fen: string): Promise<string[]> {
-        const bestmove = await this.getBestMove(fen);
-        this.sendCommand(`position fen ${fen} moves ${bestmove}`);
+    public async makeBestMove(fen: string[]): Promise<string[]> {
+        const bestmove = await this.getBestMove(fen[0]);
+        this.sendCommand(`position fen ${fen.join(' ')} moves ${bestmove}`);
 
         return await this.getFen();
     }

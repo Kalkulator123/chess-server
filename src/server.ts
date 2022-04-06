@@ -1,11 +1,7 @@
-import config from "./config.json";
-import express from 'express';
-import fs from 'fs';
+import { Stockfish } from "./services/Stockfish.service";
 
-import { Game } from "./Game";
-import { Stockfish } from "./Stockfish";
-
-let sf = new Stockfish();
+const sf = new Stockfish();
+sf.makeBestMove(["rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 2"]).then((data) => console.log(data));
 
 // const server = express();
 // const PORT = config.port;

@@ -1,7 +1,22 @@
-import { Stockfish } from "./services/Stockfish.service";
+import { connectToDatabase } from "./services/database.service";
+import { gamesRouter } from "./routes/games.router";
+import config from "./config.json";
 
-const sf = new Stockfish();
-sf.makeBestMove(["rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 2"]).then((data) => console.log(data));
+const express = require( "express" );
+const app = express();
+
+connectToDatabase()
+    .then(() => {
+        app.use("/games", gamesRouter);
+
+        app.listen(config.port, () => {
+            console.log(`Server started at http://localhost:${config.port}`);
+        });
+    })
+    .catch((error: Error) => {
+        console.error("Database connection failed", error);
+        process.exit();
+    });
 
 // const server = express();
 // const PORT = config.port;

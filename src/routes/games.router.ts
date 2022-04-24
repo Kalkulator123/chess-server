@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import { ObjectId } from "mongodb";
 import { collections } from "../services/database.service";
 import Game from "../models/game";
+import { Stockfish } from "../services/Stockfish.service";
 
 export const gamesRouter = express.Router();
 
@@ -35,11 +36,14 @@ gamesRouter.get("/:id", async (req: Request, res: Response) => {
 
 gamesRouter.post("/", async (req: Request, res: Response) => {
     try {
-        const newGame = req.body as Game;
+        const stockfish = new Stockfish();
+        const fen = await (await stockfish.getFen()).join(" ");
+
+        const newGame = { fen: fen };
         const result = await collections.games?.insertOne(newGame);
 
         result
-            ? res.status(201).send(`Successfully created a new game with id ${result.insertedId}`)
+            ? res.status(201).send(`{ "fen": "${result.insertedId}" }`)
             : res.status(500).send("Failed to create a new game.");
     } catch (error: any) {
         console.error(error);
@@ -51,34 +55,21 @@ gamesRouter.put("/:id", async (req: Request, res: Response) => {
     const id = req?.params?.id;
 
     try {
-        const updatedGame: Game = req.body as Game;
+
+        const queryOne = { _id: new ObjectId(id) };
+        const gameOne = (await collections.games?.findOne(queryOne)) as unknown as Game;
+
+        const stockfish = new Stockfish();
+        const fen = await (await stockfish.autoBot(gameOne.fen.split(' '), req.body.move)).join(" ");
+
+        const updatedGame = { fen: fen };
+
         const query = { _id: new ObjectId(id) };
-      
         const result = await collections.games?.updateOne(query, { $set: updatedGame });
 
         result
-            ? res.status(200).send(`Successfully updated game with id ${id}`)
+            ? res.status(200).send(`{ "fen": "${updatedGame.fen}" }`)
             : res.status(304).send(`Game with id: ${id} not updated`);
-    } catch (error: any) {
-        console.error(error.message);
-        res.status(400).send(error.message);
-    }
-});
-
-gamesRouter.delete("/:id", async (req: Request, res: Response) => {
-    const id = req?.params?.id;
-
-    try {
-        const query = { _id: new ObjectId(id) };
-        const result = await collections.games?.deleteOne(query);
-
-        if (result && result.deletedCount) {
-            res.status(202).send(`Successfully removed game with id ${id}`);
-        } else if (!result) {
-            res.status(400).send(`Failed to remove game with id ${id}`);
-        } else if (!result.deletedCount) {
-            res.status(404).send(`Game with id ${id} does not exist`);
-        }
     } catch (error: any) {
         console.error(error.message);
         res.status(400).send(error.message);

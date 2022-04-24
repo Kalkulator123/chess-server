@@ -3,15 +3,22 @@ import config from "../config.json";
 export class Stockfish {
     private readonly session = require('child_process').spawn(config.stockfish_path);
 
-    private async getFen(): Promise<string[]> {
+    public async getFen(): Promise<string[]> {
         this.sendCommand("d");
         const fenArray = await this.getBuffer('Fen');
         
         return this.clearFen(this.separateFen(fenArray)); 
     }
 
-    public async makeMove(fen: string, move: string): Promise<string[]> {
-        this.sendCommand(`position fen ${fen} moves ${move}`);
+    public async autoBot(fen: string[], move: string): Promise<string[]> {
+        const userMove = await this.makeMove(fen, move);
+        const botMove = await this.makeBestMove(userMove);
+
+        return botMove;
+    }
+
+    public async makeMove(fen: string[], move: string): Promise<string[]> {
+        this.sendCommand(`position fen ${fen.join(" ")} moves ${move}`);
         return this.getFen(); 
     }
 

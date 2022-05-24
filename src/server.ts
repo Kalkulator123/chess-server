@@ -1,12 +1,15 @@
 import { connectToDatabase } from "./services/database.service";
 import { gamesRouter } from "./routes/games.router";
 import config from "./config.json";
+import bodyParser from "body-parser";
 
 const express = require( "express" );
 const app = express();
 
 connectToDatabase()
     .then(() => {
+        app.use(bodyParser.urlencoded({ extended: true }));
+
         app.use("/games", gamesRouter);
 
         app.listen(config.port, () => {

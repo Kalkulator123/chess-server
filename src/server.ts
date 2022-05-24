@@ -4,11 +4,13 @@ import config from "./config.json";
 import bodyParser from "body-parser";
 
 const express = require( "express" );
+const cors = require( "cors" );
 const app = express();
 
 connectToDatabase()
     .then(() => {
         app.use(bodyParser.urlencoded({ extended: true }));
+        app.use(cors());
 
         app.use("/games", gamesRouter);
 

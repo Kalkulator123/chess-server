@@ -1,28 +1,28 @@
 import * as mongoDB from "mongodb";
-import * as dotenv from "dotenv";
+import { IConfig } from "../models/config.model";
+import { Dotenv } from "./dotenv.service";
 
 export const collections: { games?: mongoDB.Collection } = {};
 
 export async function connectToDatabase() {
-    dotenv.config()
+    const env = new Dotenv();
+    const config: IConfig = env.Config();
 
-    const DB_CONN_STRING: any = process.env.DB_CONN_STRING;
     const client: mongoDB.MongoClient = new mongoDB.MongoClient(
-        DB_CONN_STRING
+        config.DB_CONN_STRING
     );
 
     await client.connect();
 
-    const db: mongoDB.Db = client.db(process.env.DB_NAME);
+    const db: mongoDB.Db = client.db(config.DB_NAME);
 
-    const COLLECTION_NAME: any = process.env.COLLECTION_NAME;
     const gamesCollection: mongoDB.Collection = db.collection(
-        COLLECTION_NAME
+        config.COLLECTION_NAME
     );
 
     collections.games = gamesCollection;
 
     console.log(
-        `Successfully connected to database: ${db.databaseName} and collection: ${gamesCollection.collectionName}`
+        `Successfully connected to database: ${config.DB_NAME} and collection: ${config.COLLECTION_NAME}`
     );
 }

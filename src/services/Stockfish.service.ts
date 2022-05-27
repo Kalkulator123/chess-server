@@ -30,7 +30,7 @@ export class Stockfish {
         }
 
         this.sendCommand(`position fen ${fen.join(' ')} moves ${bestmove}`);
-
+        console.log(`position fen ${fen.join(' ')} moves ${bestmove}`);
         return await this.getFen();
     }
 
@@ -58,6 +58,20 @@ export class Stockfish {
         }
 
         return false;
+    }
+
+    public async makeFirstMove(fen: string): Promise<string[]> {
+        this.sendCommand(`go depth 5`);
+        const bestmoveLine = await this.getBuffer('bestmove');
+        const bestmove = await this.separateBestmove(bestmoveLine);
+
+        if(bestmove === "(none)") {
+            return ["won"];
+        }
+
+        this.sendCommand(`position fen ${fen} moves ${bestmove}`);
+        console.log(`position fen ${fen} moves ${bestmove}`);
+        return await this.getFen();
     }
 
     private async getBestMove(fen: string): Promise<string> {

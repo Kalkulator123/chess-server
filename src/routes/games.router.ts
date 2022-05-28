@@ -59,7 +59,7 @@ gamesRouter.post("/create/:team/:bot", async (req: Request, res: Response) => {
         let fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
         if(bot === "bot" && selectedTeam === "black") {
             const stockfish = new Stockfish();
-            fen = (await stockfish.makeFirstMove(fen)).join(" ");
+            fen = (await stockfish.makeBestMove(fen.split(' '))).join(" ");
         }
 
         const game: IGame = {

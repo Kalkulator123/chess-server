@@ -23,11 +23,7 @@ export class Stockfish {
     }
 
     public async makeBestMove(fen: string[]): Promise<string[]> {
-        const bestmove = await this.getBestMove(fen[0]);
-
-        if(bestmove === "(none)") {
-            return ["won"];
-        }
+        const bestmove = await this.getBestMove(fen.join(' '));
 
         this.sendCommand(`position fen ${fen.join(' ')} moves ${bestmove}`);
         console.log(`position fen ${fen.join(' ')} moves ${bestmove}`);
@@ -60,21 +56,16 @@ export class Stockfish {
         return false;
     }
 
-    public async makeFirstMove(fen: string): Promise<string[]> {
+    private async getBestMove(fen: string): Promise<string> {
+        this.sendCommand(`position fen ${fen}`);
         this.sendCommand(`go depth 5`);
+
         const bestmoveLine = await this.getBuffer('bestmove');
-        const bestmove = await this.separateBestmove(bestmoveLine);
-
-        if(bestmove === "(none)") {
-            return ["won"];
-        }
-
-        this.sendCommand(`position fen ${fen} moves ${bestmove}`);
-        console.log(`position fen ${fen} moves ${bestmove}`);
-        return await this.getFen();
+        
+        return this.separateBestmove(bestmoveLine); 
     }
 
-    private async getBestMove(fen: string): Promise<string> {
+    public async checkNextMove(fen: string): Promise<string> {
         this.sendCommand(`position fen ${fen}`);
         this.sendCommand(`go depth 5`);
 

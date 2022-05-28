@@ -43,15 +43,18 @@ moveRouter.post("/:move", async (req: Request, res: Response) => {
         let fen;
         if(gameOne.blackPlayer === "stockfish" || gameOne.whitePlayer === "stockfish") {
             fen = await (await stockfish.autoBot(gameOne.fen.split(' '), move)).join(" ");
-            if(gameOne.blackPlayer === userId) {
-                fen = (await stockfish.makeFirstMove(fen)).join(" ");
-            }
         } else {
             fen = await (await stockfish.makeMove(gameOne.fen.split(' '), move)).join(" ");
         }
         
+        let status = gameOne.status;
+        const nextMove = await stockfish.checkNextMove(fen);
+        if(nextMove === "(none)") {
+            status = fen.split(' ')[1] === "b" ? "white won" : "black won";
+        }
+
         const newGame: IGame = {
-            fen: fen,
+            fen: fen === "won" ? gameOne.fen : fen,
             status: gameOne.status,
             whitePlayer: gameOne.whitePlayer,
             blackPlayer: gameOne.blackPlayer

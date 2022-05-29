@@ -16,13 +16,7 @@ connectToDatabase()
 		app.use(bodyParser.urlencoded({ extended: true }));
 		app.use(cookieSession({ keys: ["secure-key"] }));
 
-		const corsOptions = {
-			origin: `http://127.0.0.1:3000`,
-			credentials: true,
-			optionSuccessStatus: 200,
-		};
-
-		app.use(cors(corsOptions));
+		app.use(cors());
 
 		app.use("/game", gamesRouter);
 		app.use("/move", moveRouter);

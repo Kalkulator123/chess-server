@@ -12,30 +12,30 @@ import { moveRouter } from "./routes/move.router";
 const app = express();
 
 connectToDatabase()
-    .then(() => {
-        app.use(bodyParser.urlencoded({ extended: true }));
-        app.use(cookieSession({ keys: ["secure-key"] }));
+	.then(() => {
+		app.use(bodyParser.urlencoded({ extended: true }));
+		app.use(cookieSession({ keys: ["secure-key"] }));
 
-        const corsOptions ={
-            origin:`http://localhost:${config.port}`, 
-            credentials:true,
-            optionSuccessStatus:200
-        }
+		const corsOptions = {
+			origin: `http://localhost:3000`,
+			credentials: true,
+			optionSuccessStatus: 200,
+		};
 
-        app.use(cors(corsOptions));
+		app.use(cors(corsOptions));
 
-        app.use("/game", gamesRouter);
-        app.use("/move", moveRouter);
-        app.use("/player", playerRouter);
+		app.use("/game", gamesRouter);
+		app.use("/move", moveRouter);
+		app.use("/player", playerRouter);
 
-        app.listen(config.port, () => {
-            const logo = new Sigma();
+		app.listen(config.port, () => {
+			const logo = new Sigma();
 
-            logo.draw();            
-            console.log(`Server started at http://localhost:${config.port}`);
-        });
-    })
-    .catch((error: Error) => {
-        console.error("Database connection failed", error);
-        process.exit();
-    });
+			logo.draw();
+			console.log(`Server started at http://localhost:${config.port}`);
+		});
+	})
+	.catch((error: Error) => {
+		console.error("Database connection failed", error);
+		process.exit();
+	});

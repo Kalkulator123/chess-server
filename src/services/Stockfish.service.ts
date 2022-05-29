@@ -12,6 +12,12 @@ export class Stockfish {
 
     public async autoBot(fen: string[], move: string): Promise<string[]> {
         const userMove = await this.makeMove(fen, move);
+
+        if(userMove[0] === fen[0]) {
+            console.log("here");
+            return fen;
+        }
+
         const botMove = await this.makeBestMove(userMove);
 
         return botMove;
@@ -58,7 +64,7 @@ export class Stockfish {
 
     private async getBestMove(fen: string): Promise<string> {
         this.sendCommand(`position fen ${fen}`);
-        this.sendCommand(`go depth 5`);
+        this.sendCommand(`go depth 15`);
 
         const bestmoveLine = await this.getBuffer('bestmove');
         
@@ -67,7 +73,7 @@ export class Stockfish {
 
     public async checkNextMove(fen: string): Promise<string> {
         this.sendCommand(`position fen ${fen}`);
-        this.sendCommand(`go depth 5`);
+        this.sendCommand(`go depth 15`);
 
         const bestmoveLine = await this.getBuffer('bestmove');
         

@@ -9,7 +9,7 @@ export const moveRouter = express.Router();
 moveRouter.use(express.json());
 
 moveRouter.post("/:move", async (req: Request, res: Response) => {
-    if(req.session && req.session.currentGame === "" || req.session === undefined || req.params.move === undefined) {
+    if(req.body && req.body.currentGame === "" || req.body === undefined || req.params.move === undefined) {
         const response = {
             status: "err"
         };
@@ -18,10 +18,10 @@ moveRouter.post("/:move", async (req: Request, res: Response) => {
         return;
     }
 
-    const id = req.session ? req.session.currentGame : "";
+    const id = req.body ? req.body.currentGame : "";
     const move = req.params ? req.params.move : "";
 
-    const userId = req.session ? req.session.playerId : "";
+    const userId = req.body ? req.body.playerId : "";
 
     try {
 

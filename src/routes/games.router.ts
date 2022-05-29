@@ -9,7 +9,7 @@ export const gamesRouter = express.Router();
 gamesRouter.use(express.json());
 
 gamesRouter.get("/", async (req: Request, res: Response) => {
-    if(!(req.session && req.session.currentGame !== "")) {
+    if(!(req.body.currentGame !== "")) {
         const response = {
             status: "error"
         }
@@ -18,7 +18,7 @@ gamesRouter.get("/", async (req: Request, res: Response) => {
         return;
     }
 
-    const id = req.session.currentGame;
+    const id = req.body.currentGame;
 
     try {
         const query = { _id: new ObjectId(id) };
@@ -42,7 +42,7 @@ gamesRouter.get("/", async (req: Request, res: Response) => {
 });
 
 gamesRouter.post("/create/:team/:bot", async (req: Request, res: Response) => {
-    if(req.session === undefined || (req.session && req.session.playerId === undefined || req.session && req.session.currentGame !== "")
+    if(req.body.playerId === undefined || req.body.currentGame === ""
     || req.params.team === undefined || req.params.bot === undefined) {
         const response = {
             status: "error"
@@ -65,8 +65,8 @@ gamesRouter.post("/create/:team/:bot", async (req: Request, res: Response) => {
         const game: IGame = {
             fen: fen,
             status: "started",
-            whitePlayer: (selectedTeam === "white" && req.session) ? req.session.playerId : (bot === "bot") ? "stockfish" : "",
-            blackPlayer: (selectedTeam === "black" && req.session) ? req.session.playerId : (bot === "bot") ? "stockfish" : ""
+            whitePlayer: (selectedTeam === "white") ? req.body.playerId : (bot === "bot") ? "stockfish" : "",
+            blackPlayer: (selectedTeam === "black") ? req.body.playerId : (bot === "bot") ? "stockfish" : ""
         }
 
         const result = await collections.games?.insertOne(game);
@@ -75,8 +75,6 @@ gamesRouter.post("/create/:team/:bot", async (req: Request, res: Response) => {
             id: result ? result.insertedId : "",
             status: result ? game.status : "error"
         }
-
-        if(req.session) req.session.currentGame = response.id;
 
         result
             ? res.status(201).send(response)
@@ -89,7 +87,7 @@ gamesRouter.post("/create/:team/:bot", async (req: Request, res: Response) => {
 });
 
 gamesRouter.post("/join/:id", async (req: Request, res: Response) => {
-    if(req.session === undefined || (req.session && req.session.playerId === undefined || req.session && req.session.currentGame !== "")
+    if(req.body.playerId === undefined || req.body.currentGame !== ""
     || req.params.id === undefined) {
         const response = {
             status: "error"
@@ -111,16 +109,14 @@ gamesRouter.post("/join/:id", async (req: Request, res: Response) => {
             const newGame: IGame = {
                 fen: game.fen,
                 status: game.status,
-                whitePlayer: game.whitePlayer === "" && req.session ? req.session.playerId : game.whitePlayer,
-                blackPlayer: game.blackPlayer === "" && req.session ? req.session.playerId : game.blackPlayer
+                whitePlayer: game.whitePlayer === "" ? req.body.playerId : game.whitePlayer,
+                blackPlayer: game.blackPlayer === "" ? req.body.playerId : game.blackPlayer
             }
 
             const query = { _id: new ObjectId(id) };
             const result = await collections.games?.updateOne(query, { $set: newGame });
 
-            if(result && req.session) {
-                req.session.currentGame = id;
-
+            if(result) {
                 const response = {
                     id: id,
                     status: newGame.status
@@ -147,23 +143,4 @@ gamesRouter.post("/join/:id", async (req: Request, res: Response) => {
         console.log("[express] Failed to get on /games" + id);
         res.status(404).send(`Unable to find matching document with id: ${req.params.id}`);
     }
-});
-
-gamesRouter.post("/quit", async (req: Request, res: Response) => {
-    if(req.session === undefined || (req.session && req.session.playerId === undefined || req.session && req.session.currentGame === "")) {
-        const response = {
-            status: "error"
-        }
-
-        res.send(response);
-        return;
-    }
-
-    if(req.session) req.session.currentGame = "";
-
-    const response = {
-        status: "quit"
-    }
-
-    res.status(200).send(response);
 });

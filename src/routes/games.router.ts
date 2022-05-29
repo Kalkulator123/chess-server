@@ -42,13 +42,12 @@ gamesRouter.get("/", async (req: Request, res: Response) => {
 });
 
 gamesRouter.post("/create/:team/:bot", async (req: Request, res: Response) => {
-    if(req.body.playerId === undefined || req.body.currentGame === ""
-    || req.params.team === undefined || req.params.bot === undefined) {
+    if(typeof req.body.playerId === undefined) {
         const response = {
             status: "error"
         }
 
-        res.send(response);
+        res.status(404).send(response);
         return;
     }
 
@@ -87,8 +86,7 @@ gamesRouter.post("/create/:team/:bot", async (req: Request, res: Response) => {
 });
 
 gamesRouter.post("/join/:id", async (req: Request, res: Response) => {
-    if(req.body.playerId === undefined || req.body.currentGame !== ""
-    || req.params.id === undefined) {
+    if(typeof req.body.playerId === undefined || req.body.currentGame !== "") {
         const response = {
             status: "error"
         }

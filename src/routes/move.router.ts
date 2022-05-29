@@ -9,7 +9,7 @@ export const moveRouter = express.Router();
 moveRouter.use(express.json());
 
 moveRouter.post("/:move", async (req: Request, res: Response) => {
-    if(req.body && req.body.currentGame === "" || req.body === undefined || req.params.move === undefined) {
+    if(req.body.currentGame === "" || typeof req.body === undefined) {
         const response = {
             status: "err"
         };

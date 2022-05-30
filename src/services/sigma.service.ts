@@ -255,6 +255,6 @@ export class Sigma {
      
         
         `;
-		console.log(art4);
+		console.log(art2);
 	}
 }

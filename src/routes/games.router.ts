@@ -23,9 +23,6 @@ gamesRouter.get("/", async (req: Request, res: Response) => {
     try {    
         const query = { _id: new ObjectId(id) };
         const game = (await collections.games?.findOne(query)) as unknown as Game;
-        console.log("id: " + id);
-        console.log("query: " + query);
-        console.log("game: " + game);
         if (game) {
             console.log("[express] Executed get on /games/" + id);
             res.status(200).send(game);

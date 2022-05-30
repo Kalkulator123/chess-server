@@ -70,3 +70,35 @@ moveRouter.post("/:move", async (req: Request, res: Response) => {
         res.status(400).send(error.message);
     }
 });
+moveRouter.post("/", async (req: Request, res: Response) => {    
+    console.log(req.body);
+    if(!(req.body.currentGame !== "")) {
+        const response = {
+            status: "error"
+        }
+
+        res.status(404).send(response);
+        return;
+    }
+
+    const id = req.body.currentGame;
+
+    try {    
+        const query = { _id: new ObjectId(id) };
+        const game = (await collections.games?.findOne(query)) as unknown as Game;
+        if (game) {
+            console.log("[express] Executed get on /games/" + id);
+            res.status(200).send(game);
+            return;
+        }
+
+        const response = {
+            status: "nogame"
+        }
+
+        res.status(404).send(response);
+    } catch (error) {
+        console.log("[express] Failed to get on /games" + id);
+        res.status(404).send(`Unable to find matching document with id: ${req.params.id}`);
+    }
+});

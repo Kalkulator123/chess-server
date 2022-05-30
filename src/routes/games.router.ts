@@ -8,7 +8,7 @@ export const gamesRouter = express.Router();
 
 gamesRouter.use(express.json());
 
-gamesRouter.get("/", async (req: Request, res: Response) => {
+gamesRouter.get("/", async (req: Request, res: Response) => {    
     if(!(req.body.currentGame !== "")) {
         const response = {
             status: "error"
@@ -20,10 +20,12 @@ gamesRouter.get("/", async (req: Request, res: Response) => {
 
     const id = req.body.currentGame;
 
-    try {
+    try {    
         const query = { _id: new ObjectId(id) };
         const game = (await collections.games?.findOne(query)) as unknown as Game;
-
+        console.log("id: " + id);
+        console.log("query: " + query);
+        console.log("game: " + game);
         if (game) {
             console.log("[express] Executed get on /games/" + id);
             res.status(200).send(game);

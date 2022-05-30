@@ -49,13 +49,10 @@ moveRouter.post("/:move", async (req: Request, res: Response) => {
         
         let status = gameOne.status;
         const nextMove = await stockfish.checkNextMove(fen);
-        if(nextMove === "(none)") {
-            status = fen.split(' ')[1] === "b" ? "white won" : "black won";
-        }
 
         const newGame: IGame = {
             fen: fen === "won" ? gameOne.fen : fen,
-            status: gameOne.status,
+            status: nextMove.split('')[0] === '(' ? fen.split(' ')[1] === "b" ? "black won" : "white won" : status,
             whitePlayer: gameOne.whitePlayer,
             blackPlayer: gameOne.blackPlayer
         }

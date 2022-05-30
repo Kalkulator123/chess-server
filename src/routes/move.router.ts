@@ -52,7 +52,7 @@ moveRouter.post("/:move", async (req: Request, res: Response) => {
 
         const newGame: IGame = {
             fen: fen === "won" ? gameOne.fen : fen,
-            status: nextMove.split('')[0] === '(' ? fen.split(' ')[1] === "b" ? "black won" : "white won" : status,
+            status: nextMove.split('')[0] === '(' ? fen.split(' ')[1] === "b" ? "white won" : "black won" : status,
             whitePlayer: gameOne.whitePlayer,
             blackPlayer: gameOne.blackPlayer
         }

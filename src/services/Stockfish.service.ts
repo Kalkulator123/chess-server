@@ -1,120 +1,122 @@
 import config from "../config.json";
 
 export class Stockfish {
-    private readonly session = require('child_process').spawn(config.stockfish_path);
+	private readonly session = require("child_process").spawn(
+		config.stockfish_path
+	);
 
-    public async getFen(): Promise<string[]> {
-        this.sendCommand("d");
-        const fenArray = await this.getBuffer('Fen');
-        
-        return this.clearFen(this.separateFen(fenArray)); 
-    }
+	public async getFen(): Promise<string[]> {
+		this.sendCommand("d");
+		const fenArray = await this.getBuffer("Fen");
 
-    public async autoBot(fen: string[], move: string): Promise<string[]> {
-        const userMove = await this.makeMove(fen, move);
+		return this.clearFen(this.separateFen(fenArray));
+	}
 
-        if(userMove[0] === fen[0]) {
-            console.log("here");
-            return fen;
-        }
+	public async autoBot(fen: string[], move: string): Promise<string[]> {
+		const userMove = await this.makeMove(fen, move);
 
-        const botMove = await this.makeBestMove(userMove);
+		if (userMove[0] === fen[0]) {
+			console.log("here");
+			return fen;
+		}
 
-        return botMove;
-    }
+		const botMove = await this.makeBestMove(userMove);
 
-    public async makeMove(fen: string[], move: string): Promise<string[]> {
-        this.sendCommand(`position fen ${fen.join(" ")} moves ${move}`);
-        return this.getFen(); 
-    }
+		return botMove;
+	}
 
-    public async makeBestMove(fen: string[]): Promise<string[]> {
-        const bestmove = await this.getBestMove(fen.join(' '));
+	public async makeMove(fen: string[], move: string): Promise<string[]> {
+		this.sendCommand(`position fen ${fen.join(" ")} moves ${move}`);
+		return this.getFen();
+	}
 
-        this.sendCommand(`position fen ${fen.join(' ')} moves ${bestmove}`);
-        console.log(`position fen ${fen.join(' ')} moves ${bestmove}`);
-        return await this.getFen();
-    }
+	public async makeBestMove(fen: string[]): Promise<string[]> {
+		const bestmove = await this.getBestMove(fen.join(" "));
 
-    public endSession() {
-        this.session.stdin.end();
-    }
+		this.sendCommand(`position fen ${fen.join(" ")} moves ${bestmove}`);
+		console.log(`position fen ${fen.join(" ")} moves ${bestmove}`);
+		return await this.getFen();
+	}
 
-    private getBuffer(mustContain: string): Promise<string[]> {
-        return new Promise<string[]>((resolve) => {
-                this.session.stdout.on('data', (data: any) => {
-                const bufferStringArray = data.toString().split('\n');
+	public endSession() {
+		this.session.stdin.end();
+	}
 
-                if(this.arrayContains(bufferStringArray, mustContain)) {
-                    resolve(bufferStringArray);
-                }
-            })
-        });
-    }
+	private getBuffer(mustContain: string): Promise<string[]> {
+		return new Promise<string[]>(resolve => {
+			this.session.stdout.on("data", (data: any) => {
+				const bufferStringArray = data.toString().split("\n");
 
-    private arrayContains(stringArray: string[], substring: string): boolean {
-        for(let i = 0; i < stringArray.length; i++) {
-            if (stringArray[i].includes(substring)) {
-                return true;
-            }
-        }
+				if (this.arrayContains(bufferStringArray, mustContain)) {
+					resolve(bufferStringArray);
+				}
+			});
+		});
+	}
 
-        return false;
-    }
+	private arrayContains(stringArray: string[], substring: string): boolean {
+		for (let i = 0; i < stringArray.length; i++) {
+			if (stringArray[i].includes(substring)) {
+				return true;
+			}
+		}
 
-    private async getBestMove(fen: string): Promise<string> {
-        this.sendCommand(`position fen ${fen}`);
-        this.sendCommand(`go depth 15`);
+		return false;
+	}
 
-        const bestmoveLine = await this.getBuffer('bestmove');
-        
-        return this.separateBestmove(bestmoveLine); 
-    }
+	private async getBestMove(fen: string): Promise<string> {
+		this.sendCommand(`position fen ${fen}`);
+		this.sendCommand(`go depth 15`);
 
-    public async checkNextMove(fen: string): Promise<string> {
-        this.sendCommand(`position fen ${fen}`);
-        this.sendCommand(`go depth 15`);
+		const bestmoveLine = await this.getBuffer("bestmove");
 
-        const bestmoveLine = await this.getBuffer('bestmove');
-        
-        return this.separateBestmove(bestmoveLine); 
-    }
+		return this.separateBestmove(bestmoveLine);
+	}
 
-    private separateBestmove(bestmoveStringArr: string[]): string {
-        if(this.find(bestmoveStringArr, "bestmove")) {
-            return this.find(bestmoveStringArr, "bestmove").split(' ')[1];
-        }
+	public async checkNextMove(fen: string): Promise<string> {
+		this.sendCommand(`position fen ${fen}`);
+		this.sendCommand(`go depth 15`);
 
-        return "";
-    }
+		const bestmoveLine = await this.getBuffer("bestmove");
 
-    private clearFen(fen: string): string[] {
-        let fenArr = fen.split(' ').reverse();
-        fenArr[0] = fenArr[0].substring(0, 1);
-        fenArr.pop();
+		return this.separateBestmove(bestmoveLine);
+	}
 
-        return fenArr.reverse();
-    }
+	private separateBestmove(bestmoveStringArr: string[]): string {
+		if (this.find(bestmoveStringArr, "bestmove")) {
+			return this.find(bestmoveStringArr, "bestmove").split(" ")[1];
+		}
 
-    private find(array: string[], str: string): string {
-        for(let i = 0; i < array.length; i++) {
-            if (array[i].includes(str)) {
-                return array[i];
-            }
-        }
+		return "";
+	}
 
-        return "";
-    }
+	private clearFen(fen: string): string[] {
+		let fenArr = fen.split(" ").reverse();
+		fenArr[0] = fenArr[0].substring(0, 1);
+		fenArr.pop();
 
-    private separateFen(array: string[]): string {
-        if(this.find(array, "Fen")) {
-            return this.find(array, "Fen");
-        }
+		return fenArr.reverse();
+	}
 
-        return "";
-    }
+	private find(array: string[], str: string): string {
+		for (let i = 0; i < array.length; i++) {
+			if (array[i].includes(str)) {
+				return array[i];
+			}
+		}
 
-    private sendCommand(command: string) {
-        this.session.stdin.write(command + '\n');
-    }
+		return "";
+	}
+
+	private separateFen(array: string[]): string {
+		if (this.find(array, "Fen")) {
+			return this.find(array, "Fen");
+		}
+
+		return "";
+	}
+
+	private sendCommand(command: string) {
+		this.session.stdin.write(command + "\n");
+	}
 }

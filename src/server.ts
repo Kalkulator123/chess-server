@@ -8,6 +8,7 @@ import cors from "cors";
 import { Sigma } from "./services/sigma.service";
 import { playerRouter } from "./routes/player.router";
 import { moveRouter } from "./routes/move.router";
+import { Stockfish } from "./services/Stockfish.service";
 
 const app = express();
 

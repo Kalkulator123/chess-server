@@ -116,6 +116,16 @@ export class Stockfish {
 		return "";
 	}
 
+	public async getCheckers(): Promise<boolean> {
+		this.sendCommand("d");
+		const checkers =  await this.getBuffer("Checkers:");
+		if (checkers[checkers.length - 1] !== '') {
+			return true;
+		}
+
+		return false;
+	}
+
 	private sendCommand(command: string) {
 		this.session.stdin.write(command + "\n");
 	}
